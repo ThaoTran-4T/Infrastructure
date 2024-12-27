@@ -3,14 +3,23 @@ from kafka.errors import KafkaError
 import pandas as pd
 import json
 import time
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+secret = os.getenv('secret')
 
 timing = 3
 # Initialize Kafka Producer
 producer = KafkaProducer(
-    bootstrap_servers=['localhost:9092'],  # Update to localhost if running locally
+    bootstrap_servers=['dp-event-hub.servicebus.windows.net:9093'],
+    security_protocol='SASL_SSL',
+    sasl_mechanism='PLAIN',
+    sasl_plain_username='$ConnectionString',
+    sasl_plain_password=secret,
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
-topic = 'streaming-transaction-log'
+topic = 'dp-event-hub'
 # Load data from CSV
 
 def send_to_kafka(row):
